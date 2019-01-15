@@ -1,0 +1,48 @@
+dev_update_off ()
+
+read_image(ModelImage,'D:/00.WORK/20190114/005.tif')
+
+RWidth := 300
+RHeight := 160
+dev_set_draw ('margin')
+
+gen_rectangle1 (ROI_0, 25, 70, 28.9+RWidth, 70.844+RHeight)
+* gen_rectangle1 (ROI_1, 135, 239.74, 130.82+RWidth, 239.74+RHeight)
+* gen_rectangle1 (ROI_2, 244.5, 423.196, 244.5+RWidth, 423.196+RHeight)
+* gen_rectangle1 (ROI_3, 370, 609.564, 366.02+RWidth, 609.564+RHeight)
+* gen_rectangle1 (ROI_4, 491.46, 810.492, 491.46+RWidth, 810.492+RHeight)
+* gen_rectangle1 (ROI_5, 625, 1017.24, 620.82+RWidth, 1017.24+RHeight)
+* gen_rectangle1 (ROI_6, 770, 1230, 758.02+RWidth, 1232.73+RHeight)
+dev_display (ROI_0)
+
+stop()
+
+
+*----------------ROI separation----------------*
+
+reduce_domain (ModelImage, ROI_0, ImageROI)
+inspect_shape_model (ImageROI, ShapeModelImage, ShapeModelRegion, 1, 30)
+smallest_rectangle1 (ShapeModelRegion, ModelRegionRow1, ModelRegionColumn1, ModelRegionRow2, ModelRegionColumn2)
+dev_open_window (0, Width + 20, 3 * (ModelRegionColumn2 - ModelRegionColumn1 + 10), 3 * (ModelRegionRow2 - ModelRegionRow1 + 10), 'white', WindowHandleZoom)
+dev_set_part (ModelRegionRow1 - 5, ModelRegionColumn1 - 5, ModelRegionRow2 + 5, ModelRegionColumn2 + 5)
+dev_set_color ('blue')
+dev_display (ShapeModelRegion)
+disp_continue_message (WindowHandle, 'black', 'true')
+stop ()
+
+*----------------tilt(x)----------------*
+
+
+
+
+*----------------ROI 왼쪽에서 각높이의 픽셀마다 시작점 찾고 if 문을 통해 ROI 왼쪽이 높이 구함----------------*
+
+
+
+
+*----------------ROI 오른쪽도 동일하게----------------*
+
+
+
+
+*----------------ROI 왼쪽과 오른쪽의 길이 차를 통해 납땜이 다 스며든건지 아닌지 판단----------------*
