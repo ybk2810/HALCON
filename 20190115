@@ -17,32 +17,85 @@ dev_display (ROI_0)
 
 stop()
 
+reduce_domain (ModelImage, ROI_0, ImageReduced)
+crop_domain (ImageReduced, ImagePart)
 
-*----------------ROI separation----------------*
+threshold (ImagePart, Region00, 0,20000)
+*opening_circle (Region00, RegionOpening, 3.5) 
+* erosion -> dilation
 
-reduce_domain (ModelImage, ROI_0, ImageROI)
-inspect_shape_model (ImageROI, ShapeModelImage, ShapeModelRegion, 1, 30)
-smallest_rectangle1 (ShapeModelRegion, ModelRegionRow1, ModelRegionColumn1, ModelRegionRow2, ModelRegionColumn2)
-dev_open_window (0, Width + 20, 3 * (ModelRegionColumn2 - ModelRegionColumn1 + 10), 3 * (ModelRegionRow2 - ModelRegionRow1 + 10), 'white', WindowHandleZoom)
-dev_set_part (ModelRegionRow1 - 5, ModelRegionColumn1 - 5, ModelRegionRow2 + 5, ModelRegionColumn2 + 5)
-dev_set_color ('blue')
-dev_display (ShapeModelRegion)
-disp_continue_message (WindowHandle, 'black', 'true')
-stop ()
+*closing_circle (Region00, RegionClosing, 10.5)
+* dilation -> erosion
 
-*----------------tilt(x)----------------*
+* rotate
+rotate_image (ImagePart, ImagePart, 5, 'constant')
 
 
+*gauss_filter (ImagePart, ImageGauss,11)
+threshold (ImagePart, Region1, 0, 14000)
+threshold (ImagePart, Region2, 0, 20000)
+opening_circle (Region1, RegionOpening1, 10.5)
+opening_circle (Region2, RegionOpening2, 10.5)
+
+area_center (RegionOpening1, Area, Row, Column)
 
 
-*----------------ROI 왼쪽에서 각높이의 픽셀마다 시작점 찾고 if 문을 통해 ROI 왼쪽이 높이 구함----------------*
+*gen_rectangle1 (RectangleLeft, 0, 0, 305, Column)
+*gen_rectangle1 (RectangleRight, 0, Column+1, Row*2, Column*2)
+gen_rectangle1 (RectangleUpper, Row, 0, Row*2, Column*2)
+*intersection (RectangleLeft, RegionOpening1, RegionIntersectionLeft)
+*intersection (RectangleRight, RegionOpening1, RegionIntersectionRight)
+intersection (RectangleUpper, RegionOpening1, RegionIntersectionUpper)
+
+*gray_projections (ImagePart, ImagePart, 'simple', HorProjection, VertProjection)
+
+stop()
+
+*--------------------------------*
+reduce_domain (ImagePart, RegionIntersectionUpper, ImageReduced)
+*crop_domain (ImageReduced, ImagePart)
+*area_center (ImagePart, Area, Row, Column)
+AreaLayer := 0
+
+for Index := Row to Row+1 by 1
+    gen_rectangle1 (RectangleOneLayer, Index, 0, Index+1, Column*2)
+    intersection (RectangleOneLayer, RegionIntersectionUpper, RegionIntersectionOneLayer)
+    
+    reduce_domain (ImageReduced, RectangleOneLayer, ImageReduced1)
+    crop_domain (ImageReduced1, ImageReduced)
+    area_center (ImageReduced1, AreaOneLayer, RowOneLayer, ColumnOneLayer)
+    
+    if (RowOneLayer >= AreaLayer[end])
+        AreaLayer := [AreaLayer, RowOneLayer]
+    endif
+endfor
 
 
 
 
-*----------------ROI 오른쪽도 동일하게----------------*
+
+*----------------지정영역을 원하는 형태로 변경----------------*
+shape_trans (RegionIntersectionUpper, RegionTrans, 'inner_rectangle1')
 
 
 
 
-*----------------ROI 왼쪽과 오른쪽의 길이 차를 통해 납땜이 다 스며든건지 아닌지 판단----------------*
+
+
+*--------------------------------*
+
+
+
+
+*--------------------------------*
+
+
+
+
+*--------------------------------*
+
+
+
+
+
+
